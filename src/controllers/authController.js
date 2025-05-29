@@ -15,6 +15,7 @@ const googleClientIds = (process.env.GOOGLE_CLIENT_IDS || process.env.GOOGLE_CLI
 const googleClient = new OAuth2Client();
 
 const gerarToken = (userId) => {
+  // Gera um JWT válido para o backend
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
@@ -93,20 +94,32 @@ export const loginWithGoogle = async (req, res) => {
     // Procura usuário pelo e-mail
     let user = await User.findOne({ where: { email: payload.email } });
 
-    // Se não existir, cria um novo usuário
     if (!user) {
       user = await User.create({
         nome: payload.name || payload.email.split('@')[0],
         username: payload.email.split('@')[0],
         email: payload.email,
-        senha: '', // Não há senha para login Google
+        senha: '', 
         genero: 'outro',
         foto_perfil: payload.picture,
       });
     }
 
     const token = gerarToken(user.id);
-    res.status(200).json({ token, user });
+
+    // Retorne os dados essenciais do usuário junto com o token
+    res.status(200).json({
+      token,
+      user: {
+        id: user.id,
+        nome: user.nome,
+        username: user.username,
+        email: user.email,
+        genero: user.genero,
+        foto_perfil: user.foto_perfil,
+        criado_em: user.criado_em,
+      }
+    });
   } catch (error) {
     console.error('Erro no login com Google:', error);
     res.status(500).json({ error: 'Erro ao fazer login com Google.' });

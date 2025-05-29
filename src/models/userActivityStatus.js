@@ -14,7 +14,7 @@ const UserActivityStatus = sequelize.define('UserActivityStatus', {
     allowNull: false,
   },
   atividadeId: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID, // Corrigido para UUID
     allowNull: false,
   },
   status: {

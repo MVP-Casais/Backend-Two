@@ -11,7 +11,16 @@ export const getProfile = async (req, res) => {
     });
     if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 
-    res.json(user);
+    // Retorne os dados essenciais do usuário
+    res.json({
+      id: user.id,
+      nome: user.nome,
+      username: user.username,
+      email: user.email,
+      genero: user.genero,
+      foto_perfil: user.foto_perfil,
+      criado_em: user.criado_em,
+    });
   } catch (error) {
     console.error('Erro ao buscar perfil:', error);
     res.status(500).json({ error: 'Erro no servidor' });

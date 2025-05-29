@@ -1,5 +1,5 @@
 import PlannerEvent from "../models/planner.js";
-import Couple from "../models/couple.js";
+import Couple from "../models/couple.js"; // Este model já está correto, pois usa tableName: 'casais'
 import Categoria from "../models/categoria.js";
 import { Op } from "sequelize";
 
@@ -17,14 +17,13 @@ export const createEvento = async (req, res) => {
       coupleId,
     } = req.body;
 
-    console.log('POST /api/planner', req.body);
-
     if (!coupleId || isNaN(Number(coupleId))) {
       return res.status(400).json({
         error: "coupleId inteiro é obrigatório para criar um evento.",
       });
     }
 
+    // Busca na tabela correta: casais (model Couple já usa tableName: 'casais')
     const couple = await Couple.findOne({ where: { id: Number(coupleId) } });
     if (!couple) {
       return res.status(400).json({
@@ -150,6 +149,8 @@ export const getConnectedCoupleId = async (req, res) => {
     });
 
     if (!couple) {
+      // Log detalhado para debug
+      console.log(`Usuário ${userId} não está conectado a nenhum casal.`);
       return res
         .status(404)
         .json({ error: "Usuário não está conectado a nenhum casal." });

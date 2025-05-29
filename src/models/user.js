@@ -35,6 +35,14 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  coupleId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'couples', // Agora referencia a tabela couples
+      key: 'id'
+    }
+  },
 }, {
   tableName: 'usuarios',
   timestamps: false,

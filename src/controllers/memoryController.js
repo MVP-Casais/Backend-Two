@@ -7,14 +7,14 @@ import { Op } from 'sequelize';
 export const createMemory = async (req, res) => {
   try {
     const userId = req.userId;
-    const { titulo, descricao, casal_id } = req.body;
+    const { titulo, descricao, coupleId } = req.body; // Corrija para coupleId
 
     // Debug: log do body e file
-    console.log('POST /api/memories', { userId, titulo, descricao, casal_id, file: req.file });
+    console.log('POST /api/memories', { userId, titulo, descricao, coupleId, file: req.file });
 
-    if (!titulo || !descricao || !casal_id) {
+    if (!titulo || !descricao || !coupleId) {
       console.log('Faltando campos obrigatórios');
-      return res.status(400).json({ error: 'Título, descrição e casal_id são obrigatórios.' });
+      return res.status(400).json({ error: 'Título, descrição e coupleId são obrigatórios.' });
     }
     if (!req.file) {
       console.log('Imagem não enviada');
@@ -24,16 +24,16 @@ export const createMemory = async (req, res) => {
     // Confirma se o casal existe e o usuário faz parte dele
     const couple = await Couple.findOne({
       where: {
-        id: Number(casal_id),
+        id: Number(coupleId),
         [Op.or]: [
-          { usuario1_id: userId },
-          { usuario2_id: userId }
+          { user1Id: userId },
+          { user2Id: userId }
         ]
       }
     });
+
     if (!couple) {
-      console.log('Casal não encontrado ou usuário não pertence ao casal');
-      return res.status(400).json({ error: 'Casal não encontrado ou usuário não pertence ao casal.' });
+      return res.status(400).json({ error: 'Couple não encontrado ou usuário não pertence ao casal.' });
     }
 
     // Upload da imagem para o Cloudinary
@@ -63,7 +63,7 @@ export const createMemory = async (req, res) => {
     try {
       // Debug: log dos dados antes de salvar
       console.log('Tentando salvar no banco:', {
-        casal_id: Number(casal_id),
+        casal_id: Number(coupleId),
         titulo,
         descricao,
         image_url: uploadResult.secure_url,
@@ -71,7 +71,7 @@ export const createMemory = async (req, res) => {
       });
 
       memory = await Memory.create({
-        casal_id: Number(casal_id),
+        casal_id: Number(coupleId),
         titulo,
         descricao,
         image_url: uploadResult.secure_url,
@@ -105,12 +105,12 @@ export const createMemory = async (req, res) => {
 export const getMemories = async (req, res) => {
   try {
     const userId = req.userId;
-    // Busca o casal do usuário
+    // Busca o casal do usuário na tabela couples (campos user1Id/user2Id)
     const couple = await Couple.findOne({
       where: {
         [Op.or]: [
-          { usuario1_id: userId },
-          { usuario2_id: userId }
+          { user1Id: userId },
+          { user2Id: userId }
         ]
       }
     });
@@ -118,6 +118,7 @@ export const getMemories = async (req, res) => {
       return res.status(404).json({ error: 'Usuário não está em um casal.' });
     }
 
+    // Busca as memórias usando o campo casal_id que referencia couples.id
     const memories = await Memory.findAll({
       where: { casal_id: couple.id },
       order: [['criado_em', 'DESC']]

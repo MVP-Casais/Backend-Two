@@ -81,10 +81,25 @@ export const loginWithGoogle = async (req, res) => {
       return res.status(400).json({ error: 'Token do Google não enviado.' });
     }
 
-    const ticket = await googleClient.verifyIdToken({
+    // Adicione timeout para evitar travamento se o Google não responder
+    const verifyPromise = googleClient.verifyIdToken({
       idToken,
       audience: googleClientIds,
     });
+
+    let ticket;
+    try {
+      ticket = await Promise.race([
+        verifyPromise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout ao verificar token Google')), 10000)
+        ),
+      ]);
+    } catch (timeoutErr) {
+      console.error('Timeout ou erro ao verificar token Google:', timeoutErr);
+      return res.status(504).json({ error: 'Timeout ao verificar token do Google.' });
+    }
+
     const payload = ticket.getPayload();
 
     if (!payload || !payload.email) {

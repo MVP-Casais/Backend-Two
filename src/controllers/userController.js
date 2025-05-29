@@ -7,7 +7,7 @@ export const getProfile = async (req, res) => {
     const userId = req.userId;
 
     const user = await User.findByPk(userId, {
-      attributes: ['id', 'nome', 'username', 'email', 'genero', 'foto_perfil', 'criado_em']
+      attributes: ['id', 'nome', 'username', 'email', 'genero', 'foto_perfil']
     });
     if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 
@@ -19,7 +19,6 @@ export const getProfile = async (req, res) => {
       email: user.email,
       genero: user.genero,
       foto_perfil: user.foto_perfil,
-      criado_em: user.criado_em,
     });
   } catch (error) {
     console.error('Erro ao buscar perfil:', error);

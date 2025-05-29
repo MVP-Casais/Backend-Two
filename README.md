@@ -124,4 +124,4 @@ GOOGLE_CLIENT_ID=xxxx.apps.googleusercontent.com
 
 ---
 
-**Equipe two**  
+**Equipe two**

@@ -7,11 +7,11 @@ const Couple = sequelize.define('Couple', {
     autoIncrement: true,
     primaryKey: true,
   },
-  usuario1_id: {
+  user1Id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  usuario2_id: {
+  user2Id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
@@ -19,12 +19,8 @@ const Couple = sequelize.define('Couple', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
-  data_pareamento: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  }
 }, {
-  tableName: 'casais',
+  tableName: 'couples',
   timestamps: false,
 });
 
